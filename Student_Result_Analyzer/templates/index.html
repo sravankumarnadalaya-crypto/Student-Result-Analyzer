@@ -1,0 +1,628 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+
+    <meta charset="UTF-8">
+
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>Student Result Analyzer</title>
+
+    <!-- Chart.js -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+    <style>
+
+        /* =========================
+           GENERAL
+        ========================== */
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            font-family: Arial, Helvetica, sans-serif;
+            background: linear-gradient(135deg, #eef2ff, #f8fafc);
+            color: #1e293b;
+            min-height: 100vh;
+        }
+
+        .container {
+            width: 92%;
+            max-width: 1250px;
+            margin: auto;
+            padding: 30px 0 50px;
+        }
+
+        /* =========================
+           HEADER
+        ========================== */
+
+        header {
+            text-align: center;
+            margin-bottom: 30px;
+            padding: 35px 20px;
+            background: linear-gradient(135deg, #2563eb, #4f46e5);
+            color: white;
+            border-radius: 18px;
+            box-shadow: 0 10px 30px rgba(37, 99, 235, 0.25);
+        }
+
+        header h1 {
+            font-size: 38px;
+            margin-bottom: 10px;
+        }
+
+        header p {
+            font-size: 17px;
+            opacity: 0.9;
+        }
+
+        /* =========================
+           CARDS
+        ========================== */
+
+        .card {
+            background: white;
+            padding: 25px;
+            margin-bottom: 25px;
+            border-radius: 15px;
+            box-shadow: 0 5px 20px rgba(0, 0, 0, 0.08);
+        }
+
+        .card h2 {
+            color: #1d4ed8;
+            margin-bottom: 10px;
+        }
+
+        .card p {
+            color: #64748b;
+            margin-bottom: 15px;
+        }
+
+        /* =========================
+           FORM
+        ========================== */
+
+        .form-grid {
+            display: grid;
+            grid-template-columns: repeat(
+                auto-fit,
+                minmax(180px, 1fr)
+            );
+            gap: 12px;
+            margin-bottom: 15px;
+        }
+
+        input,
+        select {
+            width: 100%;
+            padding: 12px 14px;
+            border: 1px solid #cbd5e1;
+            border-radius: 8px;
+            font-size: 15px;
+            outline: none;
+            transition: 0.3s;
+            background: white;
+        }
+
+        input:focus,
+        select:focus {
+            border-color: #2563eb;
+            box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.1);
+        }
+
+        /* =========================
+           BUTTONS
+        ========================== */
+
+        button {
+            padding: 11px 20px;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            background: #2563eb;
+            color: white;
+            margin: 5px 5px 5px 0;
+            font-size: 14px;
+            font-weight: 600;
+            transition: 0.3s;
+        }
+
+        button:hover {
+            background: #1d4ed8;
+            transform: translateY(-1px);
+        }
+
+        button:active {
+            transform: scale(0.98);
+        }
+
+        /* =========================
+           TABLE
+        ========================== */
+
+        .table-container {
+            overflow-x: auto;
+            margin-top: 20px;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            min-width: 700px;
+        }
+
+        th {
+            background: #2563eb;
+            color: white;
+            padding: 13px;
+            text-align: center;
+        }
+
+        td {
+            padding: 12px;
+            text-align: center;
+            border-bottom: 1px solid #e2e8f0;
+        }
+
+        tbody tr:hover {
+            background: #f1f5f9;
+        }
+
+        /* =========================
+           RESULT BOXES
+        ========================== */
+
+        #addMessage,
+        #sortInfo,
+        #searchResult,
+        #rangeResult,
+        #bfsResult {
+            margin-top: 15px;
+            padding: 15px;
+            border-radius: 8px;
+            background: #f1f5f9;
+            border-left: 4px solid #2563eb;
+        }
+
+        /* =========================
+           SEARCH STEPS
+        ========================== */
+
+        #searchSteps {
+            margin-top: 20px;
+        }
+
+        .step {
+            padding: 12px;
+            margin: 8px 0;
+            background: #eff6ff;
+            border-left: 4px solid #2563eb;
+            border-radius: 6px;
+        }
+
+        /* =========================
+           GRAPH
+        ========================== */
+
+        .chart-container {
+            width: 100%;
+            height: 400px;
+            margin-top: 20px;
+        }
+
+        canvas {
+            max-width: 100%;
+        }
+
+        /* =========================
+           BADGES
+        ========================== */
+
+        .success {
+            color: #15803d;
+            font-weight: bold;
+        }
+
+        .error {
+            color: #dc2626;
+            font-weight: bold;
+        }
+
+        /* =========================
+           FOOTER
+        ========================== */
+
+        footer {
+            text-align: center;
+            padding: 20px;
+            color: #64748b;
+            font-size: 14px;
+        }
+
+        /* =========================
+           RESPONSIVE
+        ========================== */
+
+        @media (max-width: 768px) {
+
+            .container {
+                width: 95%;
+                padding-top: 15px;
+            }
+
+            header h1 {
+                font-size: 28px;
+            }
+
+            header p {
+                font-size: 14px;
+            }
+
+            .card {
+                padding: 18px;
+            }
+
+            .form-grid {
+                grid-template-columns: 1fr;
+            }
+
+            button {
+                width: 100%;
+                margin-right: 0;
+            }
+
+        }
+
+    </style>
+
+</head>
+
+
+<body>
+
+<div class="container">
+
+    <!-- =========================
+         HEADER
+    ========================== -->
+
+    <header>
+
+        <h1>Student Result Analyzer</h1>
+
+        <p>
+            Sorting • Binary Search • Graphs • Range Queries
+        </p>
+
+    </header>
+
+
+    <!-- =========================
+         ADD STUDENT
+    ========================== -->
+
+    <section class="card">
+
+        <h2>Add Student</h2>
+
+        <p>
+            Enter student details and subject marks.
+        </p>
+
+        <div class="form-grid">
+
+            <input
+                type="text"
+                id="name"
+                placeholder="Student Name"
+            >
+
+            <input
+                type="number"
+                id="math"
+                placeholder="Math"
+                min="0"
+                max="100"
+            >
+
+            <input
+                type="number"
+                id="science"
+                placeholder="Science"
+                min="0"
+                max="100"
+            >
+
+            <input
+                type="number"
+                id="english"
+                placeholder="English"
+                min="0"
+                max="100"
+            >
+
+            <input
+                type="number"
+                id="computer"
+                placeholder="Computer"
+                min="0"
+                max="100"
+            >
+
+        </div>
+
+        <button onclick="addStudent()">
+            Add Student
+        </button>
+
+        <div id="addMessage"></div>
+
+    </section>
+
+
+    <!-- =========================
+         STUDENT RECORDS
+    ========================== -->
+
+    <section class="card">
+
+        <h2>Student Records</h2>
+
+        <p>
+            All student marks stored in SQLite database.
+        </p>
+
+        <button onclick="loadStudents()">
+            Refresh Records
+        </button>
+
+        <div class="table-container">
+
+            <table>
+
+                <thead>
+
+                    <tr>
+                        <th>ID</th>
+                        <th>Name</th>
+                        <th>Math</th>
+                        <th>Science</th>
+                        <th>English</th>
+                        <th>Computer</th>
+                        <th>Total</th>
+                        <th>Average</th>
+                    </tr>
+
+                </thead>
+
+                <tbody id="studentTable">
+
+                </tbody>
+
+            </table>
+
+        </div>
+
+    </section>
+
+
+    <!-- =========================
+         SORTING
+    ========================== -->
+
+    <section class="card">
+
+        <h2>Sorting & Ranking</h2>
+
+        <p>
+            Sort students based on total marks.
+        </p>
+
+        <button onclick="sortStudents('merge')">
+            Merge Sort
+        </button>
+
+        <button onclick="sortStudents('bubble')">
+            Bubble Sort
+        </button>
+
+        <div id="sortInfo"></div>
+
+        <div class="table-container">
+
+            <table>
+
+                <thead>
+
+                    <tr>
+                        <th>Rank</th>
+                        <th>Name</th>
+                        <th>Total</th>
+                        <th>Average</th>
+                    </tr>
+
+                </thead>
+
+                <tbody id="rankingTable">
+
+                </tbody>
+
+            </table>
+
+        </div>
+
+    </section>
+
+
+    <!-- =========================
+         BINARY SEARCH
+    ========================== -->
+
+    <section class="card">
+
+        <h2>Binary Search</h2>
+
+        <p>
+            Search for a student using total marks.
+            Binary Search works on sorted data.
+        </p>
+
+        <div class="form-grid">
+
+            <input
+                type="number"
+                id="searchMark"
+                placeholder="Enter total marks"
+            >
+
+        </div>
+
+        <button onclick="binarySearch()">
+            Search
+        </button>
+
+        <div id="searchResult"></div>
+
+        <div id="searchSteps"></div>
+
+    </section>
+
+
+    <!-- =========================
+         RANGE QUERY
+    ========================== -->
+
+    <section class="card">
+
+        <h2>Range Query</h2>
+
+        <p>
+            Find students whose total marks are
+            within a selected range.
+        </p>
+
+        <div class="form-grid">
+
+            <input
+                type="number"
+                id="minMark"
+                placeholder="Minimum Marks"
+            >
+
+            <input
+                type="number"
+                id="maxMark"
+                placeholder="Maximum Marks"
+            >
+
+        </div>
+
+        <button onclick="rangeQuery()">
+            Find Students
+        </button>
+
+        <div id="rangeResult"></div>
+
+    </section>
+
+
+    <!-- =========================
+         SUBJECT GRAPH
+    ========================== -->
+
+    <section class="card">
+
+        <h2>Subject Relationship Graph</h2>
+
+        <p>
+            Visualize the relationship between
+            different subjects.
+        </p>
+
+        <div class="chart-container">
+
+            <canvas id="subjectChart"></canvas>
+
+        </div>
+
+    </section>
+
+
+    <!-- =========================
+         BFS
+    ========================== -->
+
+    <section class="card">
+
+        <h2>Graph Traversal - BFS</h2>
+
+        <p>
+            Perform Breadth First Search on
+            the subject relationship graph.
+        </p>
+
+        <select id="startSubject">
+
+            <option value="Math">
+                Math
+            </option>
+
+            <option value="Science">
+                Science
+            </option>
+
+            <option value="English">
+                English
+            </option>
+
+            <option value="Computer">
+                Computer
+            </option>
+
+        </select>
+
+        <button onclick="runBFS()">
+            Run BFS
+        </button>
+
+        <div id="bfsResult"></div>
+
+    </section>
+
+
+    <!-- =========================
+         FOOTER
+    ========================== -->
+
+    <footer>
+
+        Student Result Analyzer
+        <br>
+
+        DAA Project • Python • Flask • SQLite • Chart.js
+
+    </footer>
+
+</div>
+<script>
+    async function loadStudents() {
+        
+    }
+
+    async function addStudent() {
+        
+    }
+
+
+</script>
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<script src="{{ url_for('static', filename='script.js') }}"></script>
+</body>
+
+</html>
